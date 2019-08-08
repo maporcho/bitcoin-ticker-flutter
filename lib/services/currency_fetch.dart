@@ -1,10 +1,10 @@
 import 'networking.dart';
 
-const url = 'https://apiv2.bitcoinaverage.com/indices/global/ticker/BTC';
+const url = 'https://apiv2.bitcoinaverage.com/indices/global/ticker/';
 
 class CurrencyFetcher {
-  dynamic fetchBitcoinCurrency(String to) async {
-    var networkHelper = NetworkHelper(url + to);
+  dynamic convertCurrency(String from, String to) async {
+    var networkHelper = NetworkHelper(url + from + to);
 
     var jsonData = await networkHelper.getData();
 

@@ -13,7 +13,9 @@ class PriceScreen extends StatefulWidget {
 
 class _PriceScreenState extends State<PriceScreen> {
   String selectedCurrency = 'USD';
-  String btcToUsdText = '1 BTC = ? USD';
+  var btcConverted;
+  var ethConverted;
+  var ltcConverted;
 
   androidDropdownButton() => DropdownButton<String>(
       value: selectedCurrency,
@@ -45,15 +47,26 @@ class _PriceScreenState extends State<PriceScreen> {
   @override
   void initState() {
     super.initState();
+    btcConverted = '?';
+    ethConverted = '?';
+    ltcConverted = '?';
     updateCurrency();
   }
 
   void updateCurrency() async {
-    var btcConverted =
-        await CurrencyFetcher().fetchBitcoinCurrency(selectedCurrency);
+    var _btcConverted =
+        await CurrencyFetcher().convertCurrency('BTC', selectedCurrency);
+    var _ethConverted =
+        await CurrencyFetcher().convertCurrency('ETH', selectedCurrency);
+    var _ltcConverted =
+        await CurrencyFetcher().convertCurrency('LTC', selectedCurrency);
 
     setState(() {
-      btcToUsdText = '1 BTC = $btcConverted $selectedCurrency';
+      btcConverted = _btcConverted;
+
+      ethConverted = _ethConverted;
+
+      ltcConverted = _ltcConverted;
     });
   }
 
@@ -67,26 +80,22 @@ class _PriceScreenState extends State<PriceScreen> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          Padding(
-            padding: EdgeInsets.fromLTRB(18.0, 18.0, 18.0, 0),
-            child: Card(
-              color: Colors.lightBlueAccent,
-              elevation: 5.0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10.0),
-              ),
-              child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
-                child: Text(
-                  btcToUsdText,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 20.0,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: <Widget>[
+              CryptoCard(
+                  fromCurrency: 'BTC',
+                  toCurrency: selectedCurrency,
+                  value: btcConverted.toString()),
+              CryptoCard(
+                  fromCurrency: 'ETH',
+                  toCurrency: selectedCurrency,
+                  value: ethConverted.toString()),
+              CryptoCard(
+                  fromCurrency: 'LTC',
+                  toCurrency: selectedCurrency,
+                  value: ltcConverted.toString()),
+            ],
           ),
           Container(
             height: 150.0,
@@ -96,6 +105,39 @@ class _PriceScreenState extends State<PriceScreen> {
             child: Platform.isAndroid ? androidDropdownButton() : iosPicker(),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class CryptoCard extends StatelessWidget {
+  final String fromCurrency;
+  final String toCurrency;
+  final String value;
+
+  CryptoCard({this.fromCurrency, this.toCurrency, this.value});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(18.0, 18.0, 18.0, 0),
+      child: Card(
+        color: Colors.lightBlueAccent,
+        elevation: 5.0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
+          child: Text(
+            "1 $fromCurrency = $value $toCurrency",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 20.0,
+              color: Colors.white,
+            ),
+          ),
+        ),
       ),
     );
   }
