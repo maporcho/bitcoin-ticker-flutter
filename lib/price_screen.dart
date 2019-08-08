@@ -26,6 +26,7 @@ class _PriceScreenState extends State<PriceScreen> {
       onChanged: (value) {
         setState(() {
           selectedCurrency = value;
+          updateCurrency();
         });
       });
 
@@ -33,7 +34,10 @@ class _PriceScreenState extends State<PriceScreen> {
         backgroundColor: Colors.lightBlue,
         itemExtent: 32.0,
         onSelectedItemChanged: (selectedIndex) {
-          print(selectedIndex);
+          setState(() {
+            selectedCurrency = currenciesList[selectedIndex];
+            updateCurrency();
+          });
         },
         children: currenciesList.map((value) => Text(value)).toList(),
       );
@@ -45,10 +49,11 @@ class _PriceScreenState extends State<PriceScreen> {
   }
 
   void updateCurrency() async {
-    var btcToUsd = await CurrencyFetcher().fetchCurrency();
+    var btcConverted =
+        await CurrencyFetcher().fetchBitcoinCurrency(selectedCurrency);
 
     setState(() {
-      btcToUsdText = '1 BTC = $btcToUsd USD';
+      btcToUsdText = '1 BTC = $btcConverted $selectedCurrency';
     });
   }
 
